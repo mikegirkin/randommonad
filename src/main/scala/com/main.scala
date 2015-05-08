@@ -18,42 +18,42 @@ object main {
       .mkString(sys.props("line.separator"))
   }
 
-  def dice(sides: Int) = Uniform(Range(1, sides+1, 1))
+  def die(sides: Int) = Distribution.uniform(Range(1, sides+1, 1).toArray)
 
-  def aggressive = new Given(Seq(
+  def aggressive = Distribution.given(Seq(
     (0.9 -> true), 
     (0.1 -> false)
   ))
 
-  def normal = new Given(Seq(
+  def normal = Distribution.given(Seq(
     (0.2 -> true), 
     (0.8 -> false)
   ))
 
-  def cautious = new Given(Seq(
+  def cautious = Distribution.given(Seq(
     (0.1 -> true), 
     (0.9 -> false)
   ))
 
-  def driver = new Given(Seq(
+  def driver = Distribution.given(Seq(
     (0.2 -> cautious),
     (0.6 -> normal),
     (0.2 -> aggressive)
   ))
 
   def main(args: Array[String]) = {
-    val d6 = dice(6)
+    val d6 = die(6)
     val d3d6 = for {
-      x <- d6
-      y <- d6
-      z <- d6
-    } yield x+y+z
+      x <- die(6)
+      y <- die(6)
+      z <- die(6)
+    } yield x + y + z
 
     val game = for {
-      hit <- dice(20)
-      damage <- dice(6)
-      saveThrow <- dice(10)
-      spellSuccess <- dice(100)
+      hit <- die(20)
+      damage <- die(6)
+      saveThrow <- die(10)
+      spellSuccess <- die(100)
     } yield {
       if(hit < 10) "Eaten by monster"
       else if (damage < 4) "Eaten by monster"
@@ -62,7 +62,7 @@ object main {
       else s"Success!"
     }
 
-    val family = new Uniform(Array("Boy", "Girl")).until(children => children.head == "Boy")
+    val family = Distribution.uniform(Array("Boy", "Girl")).until(children => children.head == "Boy")
 
     val population = for {
       children <- family.repeat(10).map(_.flatten)
